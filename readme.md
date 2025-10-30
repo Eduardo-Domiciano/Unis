@@ -8,6 +8,33 @@
 Receba uma frase como parâmetro.
 Retorne uma nova frase com cada palavra com as letras invertidas.
 
-## Requisitos
-Usei kivy pra juntar todos os scripts
-``
+## Executavel
+Empacotei um executavel com o PyInstaller que esta na pasta Dist.
+
+## Rodar Script
+Se quiser rodar o codigo usei uma interface do kivy pra juntar tudo.
+### Ambiente virtual
+1. Instalar ambiente virtual Linux/Mac:
+`python3 -m venv atividade` cria o ambiente com nome atividade
+`source kivy_venv/bin/activate` Ativa o ambiente
+2. Instalar ambiente virtual Windows:
+`python -m venv atividade` cria o ambiente com nome atividade
+`source atividade/Scripts/activate` Ativa usando o ==>"BASH"<==
+
+### Kivi
+1. Instalar o kivy no linux/Mac:
+```
+pip install --upgrade pip setuptools
+pip install kivy[full]
+```
+
+2. Instalar o kivy no Windows:
+`python.exe -m pip install --upgrade pip` atualiza o pip instaler
+instala o kivy
+```
+pip install --upgrade pip setuptools wheel
+pip install kivy[full]
+```
+
+### Modulo
+Da pra fazer teste em cada modulo, mas fiz o kivy pq to apendendo como criar interface e to empolgado com isso por agora.
