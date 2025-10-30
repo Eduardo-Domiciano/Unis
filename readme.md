@@ -9,7 +9,7 @@ Receba uma frase como parâmetro.
 Retorne uma nova frase com cada palavra com as letras invertidas.
 
 ## Executavel
-Empacotei um executavel com o PyInstaller que esta na pasta Dist.
+Empacotei um executavel Linux com o PyInstaller que esta na pasta Dist. Tentei empacotar pra windows em uma maquina virtual, mas nao conseguir corrigir um problema de OpenGL.
 
 ## Rodar Script
 Se quiser rodar o codigo usei uma interface do kivy pra juntar tudo.
