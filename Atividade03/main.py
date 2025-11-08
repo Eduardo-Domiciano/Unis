@@ -1,182 +1,304 @@
 import kivy
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
+from area_resp import AreaDeResultado
+from kivy.uix.button import Button
+from kivy.core.window import Window
 
 kivy.require('1.9.0')
+
 '''
-    Configurações de resolução da Janela
+    Testando algumas configurações de resolução dinamica
 '''
-# Detecta o sistema operacional em que o scipt esta sendo rodado
 import platform
 current_OS = platform.system()
-from kivy.core.window import Window
-# Descobre a resolução do monitor no Linux OS para definir o tamanho da janela e a posição
-def linux_resolution():
-    # Tamanho da janela Linux
-    import subprocess 
-    windowResolution = subprocess.check_output("xrandr | grep '*'", shell=True).decode()
-    monitorLinux = windowResolution.split()[0]
-    largura, altura = monitorLinux.split("x")
-    linux_largura = int(largura)
-    linux_altura = int(altura)
-    Window.size = (linux_largura * 0.3, linux_altura * 0.5)
-    # Posição da Janela
-    Window.left = linux_largura / 4
-    Window.top = linux_altura / 6
-    print(f"Sistema: {current_OS}, Resolução: {linux_largura} x {linux_altura}")
 
-# Descobre a resolução do monitor no Windows OS, para definir o tamanho da janela e a posição
+def linux_resolution():
+    import subprocess 
+    try:
+        windowResolution = subprocess.check_output("xrandr | grep '*'", shell=True).decode()
+        monitorLinux = windowResolution.split()[0]
+        largura, altura = monitorLinux.split("x")
+        linux_largura = int(largura)
+        linux_altura = int(altura)
+        Window.size = (linux_largura * 0.3, linux_altura * 0.5)
+        Window.left = linux_largura / 4
+        Window.top = linux_altura / 6
+        print(f"Sistema: {current_OS}, Resolução: {linux_largura} x {linux_altura}")
+    except Exception as e:
+        print(f"Erro ao obter resolução Linux: {e}. Usando padrão.")
+        standard_resolution()
+
 def windows_resolution():
-    #Tamanho da tela Windows
     import tkinter as tk 
-    tk_window = tk.Tk()
-    windows_largura = tk_window.winfo_screenwidth()
-    windows_altura = tk_window.winfo_screenheight()
-    tk_window.destroy()
-    Window.size = (windows_largura * 0.3, windows_altura * 0.5)
-    # Posição da Janela
-    Window.left = windows_largura // 4
-    Window.top = windows_altura // 6
-    print(f"Sistema: {current_OS}, Resolução: {windows_largura} x {windows_altura}")
+    try:
+        tk_window = tk.Tk()
+        windows_largura = tk_window.winfo_screenwidth()
+        windows_altura = tk_window.winfo_screenheight()
+        tk_window.destroy()
+        Window.size = (windows_largura * 0.3, windows_altura * 0.5)
+        Window.left = windows_largura // 4
+        Window.top = windows_altura // 6
+        print(f"Sistema: {current_OS}, Resolução: {windows_largura} x {windows_altura}")
+    except Exception as e:
+        print(f"Erro ao obter resolução Windows: {e}. Usando padrão.")
+        standard_resolution()
     
 
 def standard_resolution():
     Window.size = (800, 600)
-    Window.left = (Window.system_size[0] - Window.size[0]) // 2
-    Window.top  = (Window.system_size[1] - Window.size[1]) // 2
-    print(f"Sistema: {current_OS} nao encontrado")
+    try:
+        Window.left = (Window.system_size[0] - Window.size[0]) // 2
+        Window.top  = (Window.system_size[1] - Window.size[1]) // 2
+    except:
+        pass 
+    print(f"Sistema: {current_OS} não encontrado. Usando 800x600.")
 
 match current_OS:
     case "Linux":
         linux_resolution()
     case "Windows":
         windows_resolution()
-    case "":
+    case _:
         standard_resolution()
 
+
+
 class mainWindow(BoxLayout):
-    """
-    Janela principal é um boxlayout
-    """
+    
     def __init__(self, **kwargs):
         super(mainWindow, self).__init__(**kwargs)
         self.orientation = "vertical" 
+        self.spacing = 5
 
-        """
-            Conteudo da primeira Sessao
-        """
-        primeiraSessao = BoxLayout(
-            size_hint=(1, 0.1), # 100% Largura, 20% Altura
-            orientation='vertical' 
+        
+        # Sessao 1 ========================== Nome endereço=======================
+        primeiraSessao = GridLayout(
+            size_hint_y=0.1,
+            cols=2,
+            padding=10,
+            spacing=10,
+            row_default_height=35,
+            row_force_default=True
         )
         self.add_widget(primeiraSessao)
-
-        #=================================================Sessao 01 Formulário 01
-        formularioUm_primeiraSessao = BoxLayout(
-            size_hint=(0.8, 0.1), # 100% Largura, 20% Altura
-            orientation='horizontal',
-            padding=13 
+        
+        # Form 01
+        primeiraSessao.add_widget(
+            Label(text="Nome do paciente: ", size_hint_x=0.3, halign='left', valign='middle')
         )
-        primeiraSessao.add_widget(formularioUm_primeiraSessao)
-        #1 Label ===== Formulário01
-        LabelForm01 = Label(text="Nome do paciente: ",size_hint=(0.2, 1), halign='center',valign='middle')
-        formularioUm_primeiraSessao.add_widget(LabelForm01)
-        #1 input ======= Formulario01
-        inputForm01 = TextInput(
+        self.inputForm01 = TextInput(
             text='Digite aqui...', 
             multiline=False,
-            size_hint_x=0.8,
-            size_hint_y=1
+            size_hint_x=0.7
         )
-        formularioUm_primeiraSessao.add_widget(inputForm01)
+        primeiraSessao.add_widget(self.inputForm01)
 
-        #====================================================Sessao 01 Formulário 02
-        formularioDois_primeiraSessao = BoxLayout(
-            size_hint=(0.8, 0.1),
-            orientation='horizontal' ,
-            padding=13
+
+        #Form 2
+        primeiraSessao.add_widget(
+            Label(text="Endereço completo: ", size_hint_x=0.3, halign='left', valign='middle')
         )
-        primeiraSessao.add_widget(formularioDois_primeiraSessao)
-        #1 Label ===== Formulário02
-        LabelForm02 = Label(text="Endereço completo: ",size_hint=(0.2, 1), halign='center',valign='middle')
-        formularioDois_primeiraSessao.add_widget(LabelForm02)
-        #1 input ======= Formulario02
-        inputForm02 = TextInput(
+        
+        self.inputForm02 = TextInput(
             text='Digite aqui...', 
             multiline=False,
-            size_hint_x=0.8,
-            size_hint_y=1
+            size_hint_x=0.7
         )
-        formularioDois_primeiraSessao.add_widget(inputForm02)
+        primeiraSessao.add_widget(self.inputForm02)
 
 
 
 
-        """
-            Conteudo da Segunda Sessao
-        """
+        '''
+            Sessao 2 ==========================  Altura e Peso ===========================
+        '''
         segundaSessao = BoxLayout(
-            size_hint=(1, 0.2), # 100% Largura, 20% Altura
-            orientation='horizontal' 
+            size_hint=(1, 0.65), 
+            orientation='horizontal',
+            padding=[10, 5, 10, 5],
+            spacing=15
         )
-        segundaSessao.add_widget(Label(text="Área Superior (20%)"))
         self.add_widget(segundaSessao)
 
-
-        """
-            Conteudo da Terceira Sessao
-        """
-        terceiraSessao = BoxLayout(
-            size_hint=(1, 0.2), # 100% Largura, 20% Altura
-            orientation='horizontal' 
+        # Area esquerda para form de Altura e peso
+        areaInput_segundaSessao = GridLayout(
+            size_hint_x=0.4,
+            cols=2,
+            padding=5,
+            spacing=10,
+            row_default_height=35,
+            row_force_default=True
         )
-        terceiraSessao.add_widget(Label(text="Área Superior (20%)"))
+        segundaSessao.add_widget(areaInput_segundaSessao)
+
+                
+        # Altura
+        areaInput_segundaSessao.add_widget(
+            Label(text="Altura (cm): ", size_hint_x=0.5, halign='left', valign='middle')
+        )
+        
+        self.inputForm03 = TextInput(
+            text='0', 
+            multiline=False,
+            size_hint_x=0.5,
+            input_filter='float' 
+        )
+        areaInput_segundaSessao.add_widget(self.inputForm03)
+        
+        # Peso
+        areaInput_segundaSessao.add_widget(
+            Label(text="Peso (Kg): ", size_hint_x=0.5, halign='left', valign='middle')
+        )
+        
+        self.inputForm04 = TextInput(
+            text='0', 
+            multiline=False,
+            size_hint_x=0.5,
+            input_filter='float'
+        )
+        areaInput_segundaSessao.add_widget(self.inputForm04)
+        
+        # Controlador de espaço pra ajustar os elementos
+    
+        areaInput_segundaSessao.add_widget(Label(size_hint_y=None, height=1)) 
+        areaInput_segundaSessao.add_widget(Label())
+        areaInput_segundaSessao.add_widget(Label())
+
+
+        # Area Direita para Resultados (Resultado da AreaDeResultado) ====================================
+        areaResultado_segundaSessao = BoxLayout(
+            size_hint_x=0.6,
+        )
+        segundaSessao.add_widget(areaResultado_segundaSessao)
+        self.resultado_area = AreaDeResultado(text="Area de Resultados do calculo IMC.")
+        areaResultado_segundaSessao.add_widget(self.resultado_area)
+
+        '''
+            Sessao 3 ==========================  Botoes ===========================
+        '''
+        terceiraSessao = BoxLayout(
+            size_hint=(1, 0.15),
+            orientation='horizontal',
+            padding=[20, 10, 20, 10], 
+            spacing=10 
+        )
         self.add_widget(terceiraSessao)
 
-        # 1. Adiciona um Label
-        label_info2 = Label(
-            text="Digite seu nome:", 
-            size_hint=(1, 0.2)  # Ocupa 20% da altura do layout
-        )
-        terceiraSessao.add_widget(label_info2)
-        
-        # 2. Adiciona um TextInput (campo de entrada)
-        input_nome = TextInput(
-            text='Seu nome aqui', 
-            multiline=False,     # Apenas uma linha
-            size_hint=(1, 0.3)   # Ocupa 30% da altura do layout
-        )
-        terceiraSessao.add_widget(input_nome)
-        
-        # Você pode adicionar mais elementos, por exemplo, um Label
-        # que exibe o texto atual do TextInput
-        label_exibicao = Label(
-            text="Texto digitado aparecerá aqui.",
-            size_hint=(1, 0.5) # Ocupa os 50% restantes
-        )
-        terceiraSessao.add_widget(label_exibicao)
-        
-        # Opcional: Liga um evento para atualizar o Label de exibição
-        #terceiraSessao.input_nome.bind(text=ao_mudar_texto)
+        # 1. Espaçador Esquerdo de controle de posição de elementos
+        terceiraSessao.add_widget(Label())
+        terceiraSessao.add_widget(Label()) 
+        terceiraSessao.add_widget(Label()) 
 
-    def ao_mudar_texto(self, instance, value):
-        """
-        Função chamada toda vez que o texto do TextInput muda.
-        """
-        terceiraSessao.label_exibicao.text = f"Você digitou: {value}"
+        # 2. Botão Calcular
+        self.button_calc = Button(
+            text='Calcular',
+            size_hint=(None, None), 
+            size=(100, 40)
+        )
+        terceiraSessao.add_widget(self.button_calc)
+        # ligação com o metodo de calculo
+        self.button_calc.bind(on_release=self.calcular_imc)
+
+        # 4. Botão Restart
+        self.button_restart = Button(
+            text='Restart',
+            size_hint=(None, None), 
+            size=(100, 40)
+        )
+        terceiraSessao.add_widget(self.button_restart)
+        self.button_restart.bind(on_release=self.resetar_campos)
+
+        # 5. Espaçador Central 2 
+        terceiraSessao.add_widget(Label()) 
+        terceiraSessao.add_widget(Label())
+
+        # 6. Botão Sair
+        self.Button_exit = Button(
+            text='Sair',
+            size_hint=(None, None), 
+            size=(100, 40)
+        )
+        terceiraSessao.add_widget(self.Button_exit)
+        self.Button_exit.bind(on_release=App.get_running_app().stop) 
+
+    
+
+    '''
+        Metodo de calculo
+    '''
+
+    def calcular_imc(self, instance):
+        
+        nome = self.inputForm01.text.strip()
+        endereco = self.inputForm02.text.strip()
         
         
+        try:
+            altura_cm = float(self.inputForm03.text.replace(',', '.'))
+            peso_kg = float(self.inputForm04.text.replace(',', '.'))
+        except ValueError:
+            self.resultado_area.text = "ERRO: Por favor, insira valores numéricos válidos (apenas números, use ponto ou vírgula) para Altura e Peso."
+            return
+
+        # valores pos
+        if altura_cm <= 0 or peso_kg <= 0:
+            self.resultado_area.text = "ERRO: Altura e Peso devem ser valores positivos maiores que zero."
+            return
+
+        # Modelo de calc e classificacao
+        altura_m = altura_cm / 100.0 
+        imc = peso_kg / (altura_m ** 2)
+        if imc < 18.5:
+            classificacao = "Abaixo do peso"
+            cor = "Amarelo (Risco)"
+        elif 18.5 <= imc <= 24.9:
+            classificacao = "Peso normal"
+            cor = "Verde (Saudável)"
+        elif 25.0 <= imc <= 29.9:
+            classificacao = "Sobrepeso"
+            cor = "Laranja (Moderado)"
+        elif 30.0 <= imc <= 34.9:
+            classificacao = "Obesidade Grau I"
+            cor = "Vermelho (Alto)"
+        elif 35.0 <= imc <= 39.9:
+            classificacao = "Obesidade Grau II (Severa)"
+            cor = "Vermelho Escuro (Muito Alto)"
+        else: # imc >= 40.0
+            classificacao = "Obesidade Grau III (Mórbida)"
+            cor = "Roxo (Máximo)"
+            
+        # Saida
+        resultado_str = (
+            "--- RESULTADO DO CÁLCULO IMC ---\n"
+            f"Paciente: {nome if nome else '[Nome Não Informado]'}\n"
+            f"Endereço: {endereco if endereco else '[Endereço Não Informado]'}\n"
+            "\n"
+            f"IMC: {imc:.2f}\n"
+            f"Situação: {classificacao}\n"
+            f"Nível de Risco: {cor}\n"
+            "--------------------------------\n"
+        )
+        
+        self.resultado_area.text = resultado_str
+
+    def resetar_campos(self, instance):
+        self.inputForm01.text = ''
+        self.inputForm02.text = ''
+        self.inputForm03.text = '0' 
+        self.inputForm04.text = '0'
+        self.resultado_area.text = "Campos limpos. Insira Altura e Peso para um novo cálculo."
 
 
 class MinhaApp(App):
-    """
-    Classe principal da aplicação Kivy.
-    """
+    
+    title = 'Calculo do IMC - Indice de Massa Corporal'
+    
     def build(self):
-        # Retorna a nossa classe de interface como o widget raiz.
         return mainWindow()
 
 if __name__ == '__main__':
-    MinhaApp().run()
+    App.run(MinhaApp())
