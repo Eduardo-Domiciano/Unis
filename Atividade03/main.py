@@ -72,12 +72,13 @@ class mainWindow(BoxLayout):
     def __init__(self, **kwargs):
         super(mainWindow, self).__init__(**kwargs)
         self.orientation = "vertical" 
-        self.spacing = 5
+        self.spacing = 20
 
-        
-        # Sessao 1 ========================== Nome endereço=======================
+        '''
+            Sessao 1 ======================== Nome endereço======================================================
+        '''
         primeiraSessao = GridLayout(
-            size_hint_y=0.1,
+            size_hint_y=0.2,
             cols=2,
             padding=10,
             spacing=10,
@@ -86,25 +87,25 @@ class mainWindow(BoxLayout):
         )
         self.add_widget(primeiraSessao)
         
-        # Form 01
+        # Form nome
         primeiraSessao.add_widget(
             Label(text="Nome do paciente: ", size_hint_x=0.3, halign='left', valign='middle')
         )
         self.inputForm01 = TextInput(
-            text='Digite aqui...', 
+            text='', 
             multiline=False,
             size_hint_x=0.7
         )
         primeiraSessao.add_widget(self.inputForm01)
 
 
-        #Form 2
+        #Form  endereço
         primeiraSessao.add_widget(
             Label(text="Endereço completo: ", size_hint_x=0.3, halign='left', valign='middle')
         )
         
         self.inputForm02 = TextInput(
-            text='Digite aqui...', 
+            text='', 
             multiline=False,
             size_hint_x=0.7
         )
@@ -114,7 +115,7 @@ class mainWindow(BoxLayout):
 
 
         '''
-            Sessao 2 ==========================  Altura e Peso ===========================
+            Sessao 2 ==========================  Altura Peso e resultado ===========================
         '''
         segundaSessao = BoxLayout(
             size_hint=(1, 0.65), 
@@ -141,8 +142,7 @@ class mainWindow(BoxLayout):
             Label(text="Altura (cm): ", size_hint_x=0.5, halign='left', valign='middle')
         )
         
-        self.inputForm03 = TextInput(
-            text='0', 
+        self.inputForm03 = TextInput( 
             multiline=False,
             size_hint_x=0.5,
             input_filter='float' 
@@ -155,7 +155,6 @@ class mainWindow(BoxLayout):
         )
         
         self.inputForm04 = TextInput(
-            text='0', 
             multiline=False,
             size_hint_x=0.5,
             input_filter='float'
@@ -165,7 +164,6 @@ class mainWindow(BoxLayout):
         # Controlador de espaço pra ajustar os elementos
     
         areaInput_segundaSessao.add_widget(Label(size_hint_y=None, height=1)) 
-        areaInput_segundaSessao.add_widget(Label())
         areaInput_segundaSessao.add_widget(Label())
 
 
@@ -187,6 +185,7 @@ class mainWindow(BoxLayout):
             spacing=10 
         )
         self.add_widget(terceiraSessao)
+
 
         # 1. Espaçador Esquerdo de controle de posição de elementos
         terceiraSessao.add_widget(Label())
@@ -234,14 +233,17 @@ class mainWindow(BoxLayout):
     def calcular_imc(self, instance):
         
         nome = self.inputForm01.text.strip()
-        endereco = self.inputForm02.text.strip()
-        
+        endereco = self.inputForm02.text.strip()      
         
         try:
             altura_cm = float(self.inputForm03.text.replace(',', '.'))
             peso_kg = float(self.inputForm04.text.replace(',', '.'))
         except ValueError:
             self.resultado_area.text = "ERRO: Por favor, insira valores numéricos válidos (apenas números, use ponto ou vírgula) para Altura e Peso."
+            return
+
+        if not nome:
+            self.resultado_area.text = "ERRO: O campo 'Nome do paciente' é obrigatório para realizar o cálculo."
             return
 
         # valores pos
